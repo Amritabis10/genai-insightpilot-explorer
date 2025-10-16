@@ -1,5 +1,7 @@
 import os
 import streamlit as st
+from pathlib import Path
+from PIL import Image
 import threading
 import time
 
@@ -70,8 +72,8 @@ def _estimate_tokens(text: str | None) -> int:
     return n
 
 
-st.set_page_config(page_title="Athena Q&A – Strands Agent", page_icon="🧠", layout="wide")
-st.title("Ask Athena")
+st.set_page_config(page_title="GenAI InsightPilot Explorer", page_icon=Image.open(Path("assets/genai.png")), layout="wide")
+st.markdown("### Enquire about [Superstore Dataset](https://www.kaggle.com/datasets/vivek468/superstore-dataset-final) in Natural Language")
 
 
 def set_env_var(name: str, value: str | None):
@@ -87,20 +89,11 @@ def set_env_var(name: str, value: str | None):
 
 # -----------------------------
 # Sidebar: AWS + Athena settings
-# -----------------------------
-st.sidebar.header("Settings")
-
-default_region = os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION") or "us-east-1"
-default_db = os.getenv("ATHENA_DATABASE", "")
-default_wg = os.getenv("ATHENA_WORKGROUP", "")
-default_catalog = os.getenv("ATHENA_CATALOG", "AwsDataCatalog")
-default_output = os.getenv("ATHENA_OUTPUT", "")
-
-region = st.sidebar.text_input("AWS Region", value=default_region)
-database = st.sidebar.text_input("Athena Database (required)", value=default_db)
-workgroup = st.sidebar.text_input("Athena Workgroup (optional)", value=default_wg)
-catalog = st.sidebar.text_input("Data Catalog (optional)", value=default_catalog)
-output = st.sidebar.text_input("S3 Output (optional)", value=default_output, help="e.g., s3://my-bucket/athena-results/")
+region = os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION") or "us-east-1"
+database = os.getenv("ATHENA_DATABASE") or "super_store_data"
+workgroup = os.getenv("ATHENA_WORKGROUP") or ""
+catalog = os.getenv("ATHENA_CATALOG") or "AwsDataCatalog"
+output = os.getenv("ATHENA_OUTPUT") or ""
 
 set_env_var("AWS_REGION", region)
 set_env_var("AWS_DEFAULT_REGION", region)
@@ -109,27 +102,23 @@ set_env_var("ATHENA_WORKGROUP", workgroup)
 set_env_var("ATHENA_CATALOG", catalog)
 set_env_var("ATHENA_OUTPUT", output)
 
-max_rows = st.sidebar.number_input("Max rows", min_value=1, max_value=10000, value=100, step=50)
-fast_mode = st.sidebar.checkbox(
-    "Fast mode: use provided schema only (skip discovery tools)", value=True, key="fast_mode"
-)
-explain_mode = st.sidebar.checkbox(
-    "Add brief explanation after results", value=False, key="explain_mode"
-)
-display_cost = st.sidebar.checkbox(
-    "Display LLM cost estimate", value=False, key="display_cost"
-)
 
-# Sidebar: Schema & Examples (fixed in sidebar like settings)
-
-if st.sidebar.button("Reset conversation"):
-    st.session_state.messages = []
-    st.sidebar.success("Conversation reset.")
+max_rows = 100
+fast_mode = True
+explain_mode = False
+display_cost = True
 
 
 # -----------------------------
 # Schema reference (README-style, no XML)
 # -----------------------------
+default_examples = (
+    "### Example questions\n\n"
+    "- fetch total orders across years\n"
+    "- fetch top 5 states with most number of sales\n"
+    "- show total sales and profit for the furniture category\n"
+)
+
 default_schema = (
     "#### Dataset: sample.super_store_data\n\n"
     "A retail dataset of orders, customers, products, and sales metrics.\n\n"
@@ -158,20 +147,12 @@ default_schema = (
     "| profit        | double | profit amount                         |\n"
 )
 
-default_examples = (
-    "Example queries (optional):\n\n"
-    "- select count(distinct \"order id\") as \"total orders\" from \"sample\".\"super_store_data\";\n"
-    "- select city, state, count(distinct \"order id\") as \"order count\"\n"
-    "  from \"sample\".\"super_store_data\"\n"
-    "  group by 1, 2\n"
-    "  order by 3 desc;\n"
-)
-
-# Render schema in sidebar expander
+# Render schema in sidebar (non-collapsible)
 with st.sidebar:
-    with st.expander("Schema & Examples (preview)", expanded=False):
-        st.markdown(default_schema)
-        st.markdown(default_examples)
+    st.markdown("### Schema & Examples")
+    st.markdown("[Dataset source](https://www.kaggle.com/datasets/vivek468/superstore-dataset-final)")
+    st.markdown(default_examples)
+    st.markdown(default_schema)
 
 # Variables used in prompt composition
 schema_text = default_schema
@@ -248,7 +229,7 @@ for message in st.session_state.messages:
             st.markdown(content)
 
 # Always place chat input at root level so Streamlit pins it to the bottom
-prompt = st.chat_input("Ask a question about your Athena data…")
+prompt = st.chat_input("Ask a question about Superstore Dataset…")
 
 if prompt:
     if not database:

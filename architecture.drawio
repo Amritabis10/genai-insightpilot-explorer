@@ -1,0 +1,89 @@
+<mxfile host="65bd71144e">
+    <diagram name="Architecture" id="0ApNdjzb_YoBwGIOCI6k">
+        <mxGraphModel dx="611" dy="350" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="user" value="&lt;b&gt;User Input&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="120" y="370" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="appCluster" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;dashed=1;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="200" width="900" height="740" as="geometry"/>
+                </mxCell>
+                <mxCell id="clusterTitle" value="&lt;b&gt;Streamlit Application (ui.py + src package)&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;strokeColor=none;" parent="appCluster" vertex="1">
+                    <mxGeometry x="300" width="300" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="uiEntry" value="&lt;b&gt;ui.py&lt;/b&gt;&lt;div&gt;Streamlit entrypoint; imports and runs src.app.run_app()&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" parent="appCluster" vertex="1">
+                    <mxGeometry x="40" y="42" width="260" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="srcApp" value="&lt;b&gt;src/app.py&lt;/b&gt;&lt;div&gt;run_app orchestrates chat flow, session state, and rendering&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" parent="appCluster" vertex="1">
+                    <mxGeometry x="40" y="167" width="260" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="helpers" value="&lt;b&gt;src/ui/helpers.py&lt;/b&gt;&lt;div&gt;Message coercion, token estimates, table→record conversion&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="appCluster" vertex="1">
+                    <mxGeometry x="40" y="320" width="260" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="settings" value="&lt;b&gt;src/settings.py&lt;/b&gt;&lt;div&gt;Loads ATHENA_* and AWS_* env vars; syncs os.environ&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="appCluster" vertex="1">
+                    <mxGeometry x="340" y="230" width="240" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="constants" value="&lt;b&gt;src/constants.py&lt;/b&gt;&lt;div&gt;Dataset URL, schema reference, example prompts&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="appCluster" vertex="1">
+                    <mxGeometry x="340" y="340" width="240" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="servicesAgent" value="&lt;b&gt;src/services/agent.py&lt;/b&gt;&lt;div&gt;Builds strands Agent with tools (calculator, time, Athena, Vega)&lt;/div&gt;&lt;div&gt;Connects to AWS Bedrock LLMs via strands SDK&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" parent="appCluster" vertex="1">
+                    <mxGeometry x="620" y="140" width="240" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="servicesAthena" value="&lt;b&gt;src/services/athena.py&lt;/b&gt;&lt;div&gt;Executes Athena SQL, paginates results, formats Vega-Lite specs&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" parent="appCluster" vertex="1">
+                    <mxGeometry x="620" y="280" width="240" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="streamlitOutput" value="&lt;b&gt;Streamlit Output&lt;/b&gt;&lt;div&gt;Tables, SQL blocks, Vega-Lite charts, cost estimates&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;" parent="appCluster" vertex="1">
+                    <mxGeometry x="620" y="420" width="240" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="flowNotes" value="&lt;b&gt;Execution Flow&lt;/b&gt;&lt;div&gt;1. ui.py bootstraps Streamlit and session state&lt;/div&gt;&lt;div&gt;2. src.app builds instructions and calls the strands Agent&lt;/div&gt;&lt;div&gt;3. Agent tools use src.services.athena for SQL + chart data&lt;/div&gt;&lt;div&gt;4. Responses rendered via Streamlit components&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=1;" parent="appCluster" vertex="1">
+                    <mxGeometry x="620" y="540" width="240" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="edgeUiApp" style="endArrow=classic;html=1;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="appCluster" source="uiEntry" target="srcApp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edgeAppHelpers" style="endArrow=classic;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="appCluster" source="srcApp" target="helpers" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edgeAppSettings" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="appCluster" source="srcApp" target="settings" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="320" y="235"/>
+                            <mxPoint x="320" y="275"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edgeAppConstants" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="appCluster" source="srcApp" target="constants" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="320" y="235"/>
+                            <mxPoint x="320" y="385"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edgeAppAgent" style="endArrow=classic;html=1;strokeWidth=2;exitX=1;exitY=0.25;entryX=0;entryY=0.5;exitDx=0;exitDy=0;" parent="appCluster" source="srcApp" target="servicesAgent" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edgeAgentAthena" style="endArrow=classic;html=1;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="appCluster" source="servicesAgent" target="servicesAthena" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edgeAthenaOutput" style="endArrow=classic;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="appCluster" source="servicesAthena" target="streamlitOutput" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edgeUserUi" style="endArrow=classic;html=1;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="user" target="uiEntry" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" style="endArrow=classic;html=1;strokeWidth=2;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="streamlitOutput" target="user">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="110" y="635" as="sourcePoint"/>
+                        <mxPoint x="210" y="535" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="190" y="670"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -114,6 +114,7 @@ def _handle_prompt(prompt: str, settings) -> Dict:
     outputs: List[str] = []
 
     sql_instruction = _build_sql_instruction(prompt)
+    print(f"SQL instruction:\n{sql_instruction}")
     instructions.append(sql_instruction)
 
     with st.spinner("Generating SQL..."):
@@ -222,6 +223,7 @@ def _wants_chart(prompt: str) -> bool:
         "line",
         "scatter",
         "histogram",
+        "pie",
     ]
     return any(word in lowered for word in keywords)
 

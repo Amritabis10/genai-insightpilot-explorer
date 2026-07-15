@@ -16,6 +16,7 @@ class AthenaSettings:
     workgroup: Optional[str]
     catalog: str
     output: Optional[str]
+    profile: Optional[str]
 
     def apply(self) -> None:
         """Sync the settings back to environment variables used by the app."""
@@ -25,6 +26,7 @@ class AthenaSettings:
         set_env_var("ATHENA_WORKGROUP", self.workgroup)
         set_env_var("ATHENA_CATALOG", self.catalog)
         set_env_var("ATHENA_OUTPUT", self.output)
+        set_env_var("AWS_PROFILE", self.profile)
 
 
 def set_env_var(name: str, value: Optional[str]) -> None:
@@ -42,16 +44,21 @@ def load_athena_settings() -> AthenaSettings:
         or os.getenv("AWS_DEFAULT_REGION")
         or "us-east-1"
     )
-    database = os.getenv("ATHENA_DATABASE") or "super_store_data"
+    database = os.getenv("ATHENA_DATABASE") or "sample"
     workgroup = os.getenv("ATHENA_WORKGROUP") or None
     catalog = os.getenv("ATHENA_CATALOG") or "AwsDataCatalog"
-    output = os.getenv("ATHENA_OUTPUT") or None
+    output = (
+        os.getenv("ATHENA_OUTPUT")
+        or "s3://superstore-demo-937749309165-us-east-1/athena-results/"
+    )
+    profile = os.getenv("AWS_PROFILE") or "superstore-demo"
     settings = AthenaSettings(
         region=region,
         database=database,
         workgroup=workgroup,
         catalog=catalog,
         output=output,
+        profile=profile,
     )
     settings.apply()
     return settings
